@@ -1,35 +1,105 @@
 <?php
-class TaskController {
-    private $task;
 
-    public function __construct($db) {
-        $this->task = new Task($db);
+namespace App\Controllers;
+
+use App\Models\TaskModel;
+
+class TaskController extends AbstractController
+{
+    private TaskModel $taskModel;
+    public function __construct()
+    {
+        $this->taskModel = new TaskModel();
     }
-
-    // Show all tasks
-    public function index() {
-        $tasks = $this->task->getAllTasks();
-        require_once 'app/views/task_list.php';
-    }
-
-    // Add new task
-    public function add() {
-        if (isset($_POST['task_name']) && !empty($_POST['task_name'])) {
-            $this->task->addTask($_POST['task_name']);
+    // GET /lists/{listId}/tasks
+    public function index(int $listId): void
+    {
+        try {
+            $tasks = $this->taskModel->findByListId($listId);
+            $this->jsonResponse($tasks);
+        } catch (\Exception $e) {
+            $this->errorResponse($e->getMessage(), 500);
         }
-        header('Location: /');
+    }
+    // POST /lists/{listId}/tasks
+    public function create(int $listId): void
+    {
+        try {
+            $data = $this->getRequestData();
+            // Validation
+            if (!isset($data['title'])) {
+                $this->errorResponse("Le titre est obligatoire");
+                return;
+            }
+            $id = $this->taskModel->create(
+                $listId,
+                $data['title'],
+                $data['description'] ?? null
+            );
+            $this->jsonResponse([
+                'message' => 'Tâche créée avec succès',
+                'id' => $id
+            ], 201);
+        } catch (\Exception $e) {
+            $this->errorResponse($e->getMessage(), 500);
+        }
     }
 
-    // Mark task as completed
-    public function complete($id) {
-        $this->task->completeTask($id);
-        header('Location: /');
+    // PUT /tasks/{id}
+    public function update(int $id): void
+    {
+        try {
+            $data = $this->getRequestData();
+            if (!isset($data['title'])) {
+                $this->errorResponse("Le titre est obligatoire");
+                return;
+            }
+            $success = $this->taskModel->update(
+                $id,
+                $data['title'],
+                $data['description'] ?? null,
+                $data['due_date'] ?? null
+            );
+            if (!$success) {
+                $this->errorResponse("Tâche non trouvée", 404);
+                return;
+            }
+            $this->jsonResponse(['message' => 'Tâche mise à jour avec succès']);
+        } catch (\Exception $e) {
+            $this->errorResponse($e->getMessage(), 500);
+        }
     }
-
-    // Delete a task
-    public function delete($id) {
-        $this->task->deleteTask($id);
-        header('Location: /');
+    // PATCH /tasks/{id}/status
+    public function updateStatus(int $id): void
+    {
+        try {
+            $data = $this->getRequestData();
+            if (!isset($data['is_done'])) {
+                $this->errorResponse("Le statut est obligatoire");
+                return;
+            }
+            $success = $this->taskModel->updateStatus($id, (bool)$data['is_done']);
+            if (!$success) {
+                $this->errorResponse("Tâche non trouvée", 404);
+                return;
+            }
+            $this->jsonResponse(['message' => 'Statut mis à jour avec succès']);
+        } catch (\Exception $e) {
+            $this->errorResponse($e->getMessage(), 500);
+        }
+    }
+    // DELETE /tasks/{id}
+    public function delete(int $id): void
+    {
+        try {
+            $success = $this->taskModel->delete($id);
+            if (!$success) {
+                $this->errorResponse("Tâche non trouvée", 404);
+                return;
+            }
+            $this->jsonResponse(['message' => 'Tâche supprimée avec succès']);
+        } catch (\Exception $e) {
+            $this->errorResponse($e->getMessage(), 500);
+        }
     }
 }
-?>

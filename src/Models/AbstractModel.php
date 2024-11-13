@@ -1,12 +1,15 @@
 <?php
 
-namespace Models;
+namespace App\Models;
+
+use App\Config\Database;
+
 abstract class AbstractModel {
 protected \PDO $db;
 protected string $table;
     
     public function __construct() {
-        $database = new \Config\Database();
+        $database = new Database();
         $this->db = $database->getConnection();
     }
 

@@ -1,0 +1,21 @@
+{
+    "name": "uli_m/todo-api",
+    "description": "API REST pour la gestion de listes de tâches",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "JME-13",
+            "email": "uli-muir@hotmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=8.0"
+    }
+}

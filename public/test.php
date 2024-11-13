@@ -1,10 +1,11 @@
 <?php
-// Dans un fichier public/test.php
-require_once '../src/Config/Database.php';
-require_once '../src/Models/ListModel.php';
-require_once '../src/Models/TaskModel.php';
+require_once '../vendor/autoload.php';
+
+use App\Models\ListModel;
+use App\Models\TaskModel;
+
 // Test des listes
-    $listModel = new \Models\ListModel();
+    $listModel = new ListModel();
 // On crée une liste
     $listId = $listModel->create("Courses", "Liste des courses");
 // On vérifie qu'on peut la retrouver
@@ -12,7 +13,7 @@ require_once '../src/Models/TaskModel.php';
     var_dump($list);
     echo '<br/><br/>';
 // Test des tâches
-    $taskModel = new \Models\TaskModel();
+    $taskModel = new TaskModel();
 // On crée une tâche dans notre liste
     $taskId = $taskModel->create($listId, "Pain", "Acheter du pain");
 // On récupère toutes les tâches de la liste
