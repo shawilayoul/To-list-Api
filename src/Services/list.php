@@ -9,7 +9,7 @@
         table { width: 100%; margin-top: 20px; border-collapse: collapse; }
         table, th, td { border: 1px solid black; }
         th, td { padding: 10px; text-align: left; }
-        .btn { padding: 5px 10px; text-decoration: none; color: white; background-color: #4CAF50; border-radius: 5px; }
+        .btn { padding: 5px 10px; text-decoration: none; color: black; background-color: #4CAF50; border-radius: 5px; }
         .btn-delete { background-color: red; }
         .btn-complete { background-color: orange; }
     </style>
