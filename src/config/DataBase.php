@@ -5,7 +5,7 @@ class Database {
 private string $host = "localhost";
 private string $dbname = "todo_list_api";
 private string $username = "root";
-private string $password = "root_password";
+private string $password = "";
 private ?\PDO $connection = null;
 public function getConnection(): \PDO {
 // Si la connexion n'existe pas encore

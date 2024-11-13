@@ -1,35 +1,40 @@
 <?php
-class TaskController {
-    private $task;
-
-    public function __construct($db) {
-        $this->task = new Task($db);
-    }
-
-    // Show all tasks
-    public function index() {
-        $tasks = $this->task->getAllTasks();
-        require_once 'app/views/task_list.php';
-    }
-
-    // Add new task
-    public function add() {
-        if (isset($_POST['task_name']) && !empty($_POST['task_name'])) {
-            $this->task->addTask($_POST['task_name']);
-        }
-        header('Location: /');
-    }
-
-    // Mark task as completed
-    public function complete($id) {
-        $this->task->completeTask($id);
-        header('Location: /');
-    }
-
-    // Delete a task
-    public function delete($id) {
-        $this->task->deleteTask($id);
-        header('Location: /');
-    }
+namespace Controllers;
+use Models\TaskModel;
+class TaskController extends AbstractController {
+private TaskModel $taskModel;
+public function __construct() {
+$this->taskModel = new TaskModel();
 }
-?>
+// GET /lists/{listId}/tasks
+public function index(int $listId): void {
+try {
+$tasks = $this->taskModel->findByListId($listId);
+$this->jsonResponse($tasks);
+} catch (\Exception $e) {
+$this->errorResponse($e->getMessage(), 500);
+}
+}
+// POST /lists/{listId}/tasks
+public function create(int $listId): void {
+try {
+$data = $this->getRequestData();
+// Validation
+if (!isset($data['title'])) {
+$this->errorResponse("Le titre est obligatoire");
+return;
+}
+$id = $this->taskModel->create(
+$listId,
+$data['title'],
+$data['description'] ?? null
+);
+$this->jsonResponse([
+'message' => 'Tâche créée avec succès',
+'id' => $id
+], 201);
+} catch (\Exception $e) {
+$this->errorResponse($e->getMessage(), 500);
+}
+}
+}
